@@ -1,25 +1,118 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Share2, Crown, Gift } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const WaitlistMechanics = () => {
   const [referralEmail, setReferralEmail] = useState("");
+  const [userPosition, setUserPosition] = useState<number | null>(null);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleReferralSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (referralEmail) {
-      toast({
-        title: "🚀 Referral Sent!",
-        description: "You're climbing the darelist. Keep inviting to reach the top 100!",
-      });
-      setReferralEmail("");
+  // Get user's current position and referral code from localStorage
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('waitlist_email');
+    if (savedEmail) {
+      fetchUserData(savedEmail);
+    }
+  }, []);
+
+  const fetchUserData = async (email: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('waitlist')
+        .select('position, referral_code')
+        .eq('email', email)
+        .single();
+
+      if (data && !error) {
+        setUserPosition(data.position);
+        setReferralCode(data.referral_code);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
     }
   };
+
+  const handleReferralSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!referralEmail || !referralCode || isSubmitting) return;
+
+    setIsSubmitting(true);
+    try {
+      // Get referrer's ID
+      const { data: referrerData, error: referrerError } = await supabase
+        .from('waitlist')
+        .select('id')
+        .eq('referral_code', referralCode)
+        .single();
+
+      if (referrerError || !referrerData) {
+        throw new Error('Unable to process referral');
+      }
+
+      // Add referred user
+      const { data, error } = await supabase
+        .from('waitlist')
+        .insert([{ 
+          email: referralEmail, 
+          referred_by: referrerData.id 
+        }])
+        .select('position')
+        .single();
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Already registered! 🎯",
+            description: "This email is already on the waitlist.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "🚀 Referral Sent!",
+          description: `Your friend is now #${data.position} on the waitlist. You're climbing higher!`,
+        });
+        setReferralEmail("");
+        
+        // Refresh user's position
+        const savedEmail = localStorage.getItem('waitlist_email');
+        if (savedEmail) {
+          setTimeout(() => fetchUserData(savedEmail), 1000);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing referral:', error);
+      toast({
+        title: "Referral failed",
+        description: "Please try again in a moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Save email when user joins from Hero component
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedEmail = localStorage.getItem('waitlist_email');
+      if (savedEmail) {
+        fetchUserData(savedEmail);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <section className="py-20 px-4">
@@ -46,26 +139,38 @@ export const WaitlistMechanics = () => {
               </p>
               
               <div className="bg-black/30 rounded-full p-4 mb-6">
-                <div className="text-3xl font-bold text-orange-400 mb-1">#247</div>
+                <div className="text-3xl font-bold text-orange-400 mb-1">
+                  #{userPosition || "Join to see"}
+                </div>
                 <div className="text-gray-400 text-sm">Your Current Rank</div>
               </div>
 
-              <form onSubmit={handleReferralSubmit} className="space-y-3">
-                <Input
-                  type="email"
-                  placeholder="Friend's email"
-                  value={referralEmail}
-                  onChange={(e) => setReferralEmail(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white placeholder-gray-400"
-                />
-                <Button 
-                  type="submit"
-                  className="w-full bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700"
-                >
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Send Invite
-                </Button>
-              </form>
+              {referralCode && (
+                <form onSubmit={handleReferralSubmit} className="space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="Friend's email"
+                    value={referralEmail}
+                    onChange={(e) => setReferralEmail(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder-gray-400"
+                    disabled={isSubmitting}
+                  />
+                  <Button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 disabled:opacity-50"
+                  >
+                    <Share2 className="w-4 h-4 mr-2" />
+                    {isSubmitting ? "Sending..." : "Send Invite"}
+                  </Button>
+                </form>
+              )}
+
+              {!referralCode && (
+                <p className="text-gray-400 text-sm">
+                  Join the waitlist to start referring friends!
+                </p>
+              )}
             </div>
           </Card>
 

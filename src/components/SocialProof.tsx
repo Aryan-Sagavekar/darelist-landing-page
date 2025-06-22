@@ -2,15 +2,45 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 export const SocialProof = () => {
-  const [waitlistCount, setWaitlistCount] = useState(3500);
+  const [waitlistCount, setWaitlistCount] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setWaitlistCount(prev => prev + Math.floor(Math.random() * 3) + 1);
-    }, 5000);
-    return () => clearInterval(interval);
+    // Get initial count
+    const fetchWaitlistCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('waitlist')
+          .select('*', { count: 'exact', head: true });
+        
+        if (!error && count !== null) {
+          setWaitlistCount(count);
+        }
+      } catch (error) {
+        console.error('Error fetching waitlist count:', error);
+        // Fallback to a default number if database is unavailable
+        setWaitlistCount(3742);
+      }
+    };
+
+    fetchWaitlistCount();
+
+    // Set up real-time subscription to update count
+    const subscription = supabase
+      .channel('waitlist-changes')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'waitlist' },
+        () => {
+          fetchWaitlistCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const testimonials = [
@@ -39,7 +69,7 @@ export const SocialProof = () => {
           <div className="inline-flex items-center bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/30 rounded-full px-6 py-3 mb-6">
             <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
             <span className="text-white font-bold text-lg">
-              {waitlistCount.toLocaleString()}+ squads already waiting. Are you in?
+              {waitlistCount > 0 ? `${waitlistCount.toLocaleString()}+ squads already waiting. Are you in?` : "Be the first to join the darelist!"}
             </span>
           </div>
         </div>
