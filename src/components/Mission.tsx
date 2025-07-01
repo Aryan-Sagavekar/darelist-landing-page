@@ -21,7 +21,7 @@ export const Mission = () => {
                 <span className="text-white font-bold text-lg">E</span>
               </div>
               <div className="text-left">
-                <div className="text-white font-bold text-lg">– The Entrext Team</div>
+                <div className="text-white font-bold text-lg">The Entrext Team</div>
                 <div className="text-gray-400">Building the future of social gaming</div>
               </div>
             </div>

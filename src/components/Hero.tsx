@@ -135,7 +135,7 @@ export const Hero = () => {
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
-            <span className="text-gray-300">Real-time Leaderboards</span>
+            <span className="text-gray-300">Real time Leaderboards</span>
           </div>
           <div className="flex items-center">
             <div className="w-3 h-3 bg-pink-400 rounded-full mr-3"></div>

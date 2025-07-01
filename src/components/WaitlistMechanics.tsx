@@ -133,7 +133,7 @@ export const WaitlistMechanics = () => {
               <h3 className="text-2xl font-bold text-black mb-4">
                 Climb the Darelist
               </h3>
-              <p className="text-gray-700 mb-6">
+              <p className="text-black mb-6">
                 Invite your squad and rise to the top. The more friends you bring, the higher you climb!
               </p>
               
@@ -180,26 +180,26 @@ export const WaitlistMechanics = () => {
               <h3 className="text-2xl font-bold text-black mb-4">
                 Elite Access
               </h3>
-              <p className="text-gray-700 mb-6">
+              <p className="text-black mb-6">
                 Top 100 squads get exclusive perks that money can't buy.
               </p>
               
               <div className="space-y-4 text-left">
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
-                  <span className="text-gray-800">Early access (2 weeks before launch)</span>
+                  <span className="text-black">Early access (2 weeks before launch)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-pink-400 rounded-full mr-3"></div>
-                  <span className="text-gray-800">Exclusive first challenge rewards</span>
+                  <span className="text-black">Exclusive first challenge rewards</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-orange-400 rounded-full mr-3"></div>
-                  <span className="text-gray-800">VIP squad status & badges</span>
+                  <span className="text-black">VIP squad status & badges</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                  <span className="text-gray-800">Direct line to Entrext team</span>
+                  <span className="text-black">Direct line to Entrext team</span>
                 </div>
               </div>
             </div>
