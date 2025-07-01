@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -131,10 +130,10 @@ export const WaitlistMechanics = () => {
           <Card className="p-8 bg-gradient-to-br from-orange-500/10 to-pink-500/10 border-orange-500/20">
             <div className="text-center">
               <Crown className="w-12 h-12 text-orange-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3 className="text-2xl font-bold text-black mb-4">
                 Climb the Darelist
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-700 mb-6">
                 Invite your squad and rise to the top. The more friends you bring, the higher you climb!
               </p>
               
@@ -178,29 +177,29 @@ export const WaitlistMechanics = () => {
           <Card className="p-8 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
             <div className="text-center">
               <Gift className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-white mb-4">
+              <h3 className="text-2xl font-bold text-black mb-4">
                 Elite Access
               </h3>
-              <p className="text-gray-300 mb-6">
+              <p className="text-gray-700 mb-6">
                 Top 100 squads get exclusive perks that money can't buy.
               </p>
               
               <div className="space-y-4 text-left">
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
-                  <span className="text-gray-200">Early access (2 weeks before launch)</span>
+                  <span className="text-gray-800">Early access (2 weeks before launch)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-pink-400 rounded-full mr-3"></div>
-                  <span className="text-gray-200">Exclusive first challenge rewards</span>
+                  <span className="text-gray-800">Exclusive first challenge rewards</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-orange-400 rounded-full mr-3"></div>
-                  <span className="text-gray-200">VIP squad status & badges</span>
+                  <span className="text-gray-800">VIP squad status & badges</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-2 h-2 bg-yellow-400 rounded-full mr-3"></div>
-                  <span className="text-gray-200">Direct line to Entrext team</span>
+                  <span className="text-gray-800">Direct line to Entrext team</span>
                 </div>
               </div>
             </div>

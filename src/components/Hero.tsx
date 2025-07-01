@@ -1,13 +1,12 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Zap, Users, Trophy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Hero = () => {
   const [email, setEmail] = useState("");
+  const [friendEmail, setFriendEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -17,36 +16,60 @@ export const Hero = () => {
 
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
+      // Add main user to waitlist
+      const { data: userData, error: userError } = await supabase
         .from('waitlist')
         .insert([{ email }])
-        .select('position')
+        .select('position, referral_code')
         .single();
 
-      if (error) {
-        if (error.code === '23505') { // Unique constraint violation
+      if (userError) {
+        if (userError.code === '23505') {
           toast({
-            title: "Already on the list! 🎯",
-            description: "This email is already registered for early access.",
+            title: "Already on the darelist! 🎯",
+            description: "This email is already registered. Check your inbox for updates!",
             variant: "destructive",
           });
         } else {
-          throw error;
+          throw userError;
         }
-      } else {
-        // Save email to localStorage for referral tracking
-        localStorage.setItem('waitlist_email', email);
-        
-        toast({
-          title: "🔥 You're on the Darelist!",
-          description: `Position #${data.position} - Get ready for the ultimate social challenge experience.`,
-        });
-        setEmail("");
+        return;
       }
-    } catch (error) {
-      console.error('Error adding to waitlist:', error);
+
+      // If friend email is provided and main signup was successful, add friend too
+      if (friendEmail && userData) {
+        try {
+          await supabase
+            .from('waitlist')
+            .insert([{ 
+              email: friendEmail, 
+              referred_by: userData.referral_code ? 
+                (await supabase.from('waitlist').select('id').eq('referral_code', userData.referral_code).single()).data?.id 
+                : null 
+            }]);
+        } catch (friendError) {
+          // Don't fail the main signup if friend signup fails
+          console.log('Friend signup failed:', friendError);
+        }
+      }
+
+      // Save email to localStorage for later use
+      localStorage.setItem('waitlist_email', email);
+      
+      // Trigger storage event to update other components
+      window.dispatchEvent(new Event('storage'));
+
       toast({
-        title: "Oops! Something went wrong",
+        title: "🚀 You're on the darelist!",
+        description: `Welcome to position #${userData.position}! ${friendEmail ? 'Your friend has been added too.' : ''}`,
+      });
+
+      setEmail("");
+      setFriendEmail("");
+    } catch (error) {
+      console.error('Error joining waitlist:', error);
+      toast({
+        title: "Something went wrong",
         description: "Please try again in a moment.",
         variant: "destructive",
       });
@@ -56,65 +79,69 @@ export const Hero = () => {
   };
 
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-20">
-      <div className="max-w-4xl mx-auto text-center">
-        {/* Floating icons */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <Zap className="absolute top-20 left-20 w-6 h-6 text-orange-400 animate-bounce opacity-60" style={{ animationDelay: '0s' }} />
-          <Users className="absolute top-32 right-32 w-8 h-8 text-purple-400 animate-bounce opacity-60" style={{ animationDelay: '1s' }} />
-          <Trophy className="absolute bottom-40 left-16 w-7 h-7 text-yellow-400 animate-bounce opacity-60" style={{ animationDelay: '2s' }} />
-        </div>
-
-        {/* Main headline */}
-        <div className="mb-8">
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tight">
-            The Ultimate
-            <span className="block bg-gradient-to-r from-orange-400 via-pink-500 to-purple-600 bg-clip-text text-transparent animate-pulse">
-              Social Dare
-            </span>
-            Experience is Coming.
-          </h1>
-          
-          <div className="text-2xl md:text-3xl font-bold text-gray-200 mb-6 tracking-wide">
-            <span className="text-orange-400">Outplay.</span>
-            <span className="text-pink-400 mx-2">Outdare.</span>
-            <span className="text-purple-400">Outlast.</span>
-          </div>
-        </div>
-
-        {/* Subheadline */}
-        <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed max-w-3xl mx-auto">
-          Join <span className="font-bold text-white">FriendsIn</span> — where squads rise, dares get real, and only the bold win. 
-          <br className="hidden md:block" />
-          Built for the fearless, by <span className="text-gradient bg-gradient-to-r from-orange-400 to-purple-400 bg-clip-text text-transparent font-semibold">Entrext</span>.
+    <section className="min-h-screen flex items-center justify-center px-4 relative">
+      {/* Ambient background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '4s' }}></div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8">
+          Unleash Epic Challenges with Your Squad
+        </h1>
+        <p className="text-xl text-gray-300 mb-12">
+          Turn everyday moments into unforgettable dares.
         </p>
 
-        {/* Email capture form */}
-        <form onSubmit={handleSubmit} className="max-w-md mx-auto mb-8">
-          <div className="flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
+          <div className="flex flex-col space-y-3">
             <Input
               type="email"
-              placeholder="Your email address"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 h-14 text-lg bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-orange-400 focus:ring-orange-400"
+              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20"
               required
               disabled={isSubmitting}
             />
-            <Button 
-              type="submit"
+            <Input
+              type="email"
+              placeholder="Friend's email (optional)"
+              value={friendEmail}
+              onChange={(e) => setFriendEmail(e.target.value)}
+              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20"
               disabled={isSubmitting}
-              className="h-14 px-8 bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 text-white font-bold text-lg border-0 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            />
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="h-12 text-lg bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 disabled:opacity-50"
             >
-              {isSubmitting ? "Joining..." : "Join the Darelist"}
+              {isSubmitting ? "Joining..." : "Join the Darelist 🔥"}
             </Button>
           </div>
         </form>
 
-        {/* Social proof */}
-        <p className="text-gray-400 text-sm">
-          Backed by challenge-loving squads across India 🇮🇳
+        <p className="mt-8 text-gray-400">
+          🎉 Early access for the first 1,000 squads.
         </p>
+
+        <div className="mt-12 flex flex-col md:flex-row justify-center items-center gap-6">
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+            <span className="text-gray-300">Unlimited Challenges</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
+            <span className="text-gray-300">Real-time Leaderboards</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-3 h-3 bg-pink-400 rounded-full mr-3"></div>
+            <span className="text-gray-300">Exclusive Rewards</span>
+          </div>
+        </div>
       </div>
     </section>
   );
