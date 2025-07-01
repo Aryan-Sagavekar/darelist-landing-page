@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -87,12 +88,24 @@ export const Hero = () => {
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{ animationDelay: '4s' }}></div>
       </div>
       
-      <div className="max-w-4xl mx-auto text-center relative z-10">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8">
-          Unleash Epic Challenges with Your Squad
-        </h1>
-        <p className="text-xl text-gray-300 mb-12">
-          Turn everyday moments into unforgettable dares.
+      <div className="max-w-5xl mx-auto text-center relative z-10">
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            The Ultimate
+          </h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 mb-4 leading-tight">
+            Social Dare
+          </h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            Experience is Coming.
+          </h1>
+          <p className="text-2xl md:text-3xl font-bold text-orange-300 mb-8 tracking-wide">
+            Outplay. Outdare. Outlast.
+          </p>
+        </div>
+        
+        <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
+          Turn everyday moments into unforgettable dares with your squad.
         </p>
 
         <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
@@ -102,7 +115,7 @@ export const Hero = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20"
+              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20 backdrop-blur-sm"
               required
               disabled={isSubmitting}
             />
@@ -111,35 +124,35 @@ export const Hero = () => {
               placeholder="Friend's email (optional)"
               value={friendEmail}
               onChange={(e) => setFriendEmail(e.target.value)}
-              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20"
+              className="h-12 text-lg bg-white/10 border-white/20 text-white placeholder-gray-300 focus:bg-white/20 backdrop-blur-sm"
               disabled={isSubmitting}
             />
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="h-12 text-lg bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 disabled:opacity-50"
+              className="h-12 text-lg bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-600 hover:to-pink-700 disabled:opacity-50 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               {isSubmitting ? "Joining..." : "Join the Darelist 🔥"}
             </Button>
           </div>
         </form>
 
-        <p className="mt-8 text-gray-400">
+        <p className="mt-8 text-gray-400 font-medium">
           🎉 Early access for the first 1,000 squads.
         </p>
 
-        <div className="mt-12 flex flex-col md:flex-row justify-center items-center gap-6">
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
-            <span className="text-gray-300">Unlimited Challenges</span>
+        <div className="mt-12 flex flex-col md:flex-row justify-center items-center gap-8">
+          <div className="flex items-center group">
+            <div className="w-3 h-3 bg-green-400 rounded-full mr-3 group-hover:scale-110 transition-transform"></div>
+            <span className="text-gray-300 font-medium">Unlimited Challenges</span>
           </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
-            <span className="text-gray-300">Real time Leaderboards</span>
+          <div className="flex items-center group">
+            <div className="w-3 h-3 bg-blue-400 rounded-full mr-3 group-hover:scale-110 transition-transform"></div>
+            <span className="text-gray-300 font-medium">Real time Leaderboards</span>
           </div>
-          <div className="flex items-center">
-            <div className="w-3 h-3 bg-pink-400 rounded-full mr-3"></div>
-            <span className="text-gray-300">Exclusive Rewards</span>
+          <div className="flex items-center group">
+            <div className="w-3 h-3 bg-pink-400 rounded-full mr-3 group-hover:scale-110 transition-transform"></div>
+            <span className="text-gray-300 font-medium">Exclusive Rewards</span>
           </div>
         </div>
       </div>
